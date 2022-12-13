@@ -43,14 +43,15 @@ class Reddit():
     def _load_all_posts_to_df(self):
         """Load the json into a pandas dataframe
         """
-        results = self._get_reddit_request()
-        if results['data']['dist']==0:
-            print('No Posts found,Maybe a wrong subreddit name')
-            exit()
+        results = self._get_reddit_request()    
         myDict = {}
-        for post in results['data']['children']:
-            myDict[post['data']['id']] = {'post_id':post['data']['name'],'title':post['data']['title'][:255],'score':post['data']['score']}
-        self.post_df = pd.DataFrame.from_dict(myDict, orient='index')
+        try:
+            for post in results['data']['children']:
+                myDict[post['data']['id']] = {'post_id':post['data']['name'],'title':post['data']['title'][:255],'score':post['data']['score']}
+            self.post_df = pd.DataFrame.from_dict(myDict, orient='index')
+        except Exception:
+              print('No Posts found,Maybe a wrong subreddit name or something is wrong at our end')
+              exit()
        
         
     def print_new_post(self):
