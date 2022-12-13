@@ -7,7 +7,10 @@ A django app to get latest posts from reddit and multiple other things.
 
 Quickstart
 ----------
-docker compose up -d
+1. Build the images and run the containers:
+  ```
+    docker-compose up -d --build
+  ```
 
 ### USAGE From CLI
     
