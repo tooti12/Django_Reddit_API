@@ -4,7 +4,7 @@ import json
 from reddit.models import Post
 class Reddit():
 
-    def __init__(self,subreddit:str,top_posts_count:int,post_type:str='new.json') -> None:
+    def __init__(self,subreddit:str,top_posts_count:int,post_type:str='top.json') -> None:
         """Initialize all the required variables.
         We also keep the previous execution ids.
         """
@@ -32,7 +32,7 @@ class Reddit():
             json: Json response from the reddit api
         """
         try:
-            url = f'{self.base_url}/{self.post_type}'
+            url = f'{self.base_url}/{self.post_type}?limit=75&t=month'
             resp = requests.get(url, headers=self.HEADERS)
         except Exception:
             print('Something Went Wrong')
@@ -47,7 +47,7 @@ class Reddit():
         myDict = {}
         try:
             for post in results['data']['children']:
-                myDict[post['data']['id']] = {'post_id':post['data']['name'],'title':post['data']['title'][:255],'score':post['data']['score']}
+                myDict[post['data']['id']] = {'post_id':post['data']['name'],'title':post['data']['title'][:255],'score':post['data']['score'],'ups':post['data']['ups']}
             self.post_df = pd.DataFrame.from_dict(myDict, orient='index')
         except Exception:
               print('No Posts found,Maybe a wrong subreddit name or something is wrong at our end')
@@ -67,7 +67,7 @@ class Reddit():
             # Add new posts in the db
             print('New posts from the last program execution \n')
             print(f'{new_posts_from_previous_execution}\n')
-            model_instances = [Post(post_id=data.post_id,title=data.title,score=data.score) for data in  new_posts_from_previous_execution.itertuples()]
+            model_instances = [Post(post_id=data.post_id,title=data.title,score=data.score,ups=data.ups) for data in  new_posts_from_previous_execution.itertuples()]
             Post.objects.bulk_create(model_instances)
         print("-------------------------------------")
     def print_updated_vote_count(self):
@@ -98,7 +98,7 @@ class Reddit():
         us or new top posts. We compare our new top posts with previous execution
         top posts which we had saved when initializing the class
         """
-        top_n_posts = list(Post.objects.all().order_by('-score').values_list('post_id',flat=True))
+        top_n_posts = list(Post.objects.all().order_by('-ups').values_list('post_id',flat=True))
         n = self.top_posts_count # Number of post we consider to be top
         # Slicing, no check on length since slicing does not give you an error on non-existent values
         print(f'Posts No longer within top {n} posts:\n')
