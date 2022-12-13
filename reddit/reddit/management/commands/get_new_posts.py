@@ -13,10 +13,18 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('subreddit',type=str, help='The subreddit name your are looking for')
+        parser.add_argument(
+            '-i',
+            '--top-posts-count',
+            type=int,
+            default=75,
+            help='The number of posts you want to consider as top.',
+        )
     
     def handle(self, *args, **options):
         subreddit = options.get('subreddit')
-        reddit = Reddit(subreddit=subreddit)
+        top_post_count = options.get('top_posts_count')
+        reddit = Reddit(subreddit=subreddit,top_posts_count=top_post_count)
         reddit.print_new_post()
         reddit.print_updated_vote_count()
         reddit.print_posts_not_in_top()

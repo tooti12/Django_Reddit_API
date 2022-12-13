@@ -4,7 +4,7 @@ import json
 from reddit.models import Post
 class Reddit():
 
-    def __init__(self,subreddit:str,post_type:str='new.json',top_posts_count:int = 15) -> None:
+    def __init__(self,subreddit:str,top_posts_count:int,post_type:str='new.json') -> None:
         """Initialize all the required variables.
         We also keep the previous execution ids.
         """
@@ -44,9 +44,12 @@ class Reddit():
         """Load the json into a pandas dataframe
         """
         results = self._get_reddit_request()
+        if results['data']['dist']==0:
+            print('No Posts found,Maybe a wrong subreddit name')
+            exit()
         myDict = {}
         for post in results['data']['children']:
-            myDict[post['data']['id']] = {'post_id':post['data']['name'],'title':post['data']['title'],'score':post['data']['score']}
+            myDict[post['data']['id']] = {'post_id':post['data']['name'],'title':post['data']['title'][:255],'score':post['data']['score']}
         self.post_df = pd.DataFrame.from_dict(myDict, orient='index')
        
         
