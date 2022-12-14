@@ -86,9 +86,9 @@ class Reddit():
                 # Vote count was changed, the post was same but the votes have changed.
                 # Score is the sum of (Upvotes - DownVotes)
                 if current_post.score<repeating_post_score:
-                    print(f'-> {current_post.post_id} - {current_post.title} had a vote count change of {repeating_post_score-current_post.score}\n') 
+                    print(f'-> {current_post.post_id} - {current_post.title} - had a vote count change of {repeating_post_score-current_post.score}\n') 
                 else:
-                    print(f'-> {current_post.post_id} - {current_post.title} had a vote count change of {current_post.score - repeating_post_score}\n') 
+                    print(f'-> {current_post.post_id} - {current_post.title} - had a vote count change of {current_post.score - repeating_post_score}\n') 
                 # Update the new score and upvotes in the DB, 
                 # new score means upvotes might have been changed
                 current_post.score = repeating_post_score
