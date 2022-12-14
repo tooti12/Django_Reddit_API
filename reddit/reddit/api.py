@@ -17,8 +17,8 @@ class Reddit():
         self.post_type = post_type
         self.top_posts_count = top_posts_count
         self.post_df = None
-        # Fetch the previous post_ids ordered by score.Essentially means ordered by TOP post
-        self.previous_execution_post_ids = list(Post.objects.all().order_by('-score').values_list('post_id',flat=True))
+        # Fetch the previous post_ids ordered by ups desc.Essentially means ordered by TOP post
+        self.previous_execution_post_ids = list(Post.objects.all().order_by('-ups').values_list('post_id',flat=True))
         self._load_all_posts_to_df()
 
 
@@ -81,6 +81,7 @@ class Reddit():
         for post_id in similar_posts_from_new_request['post_id']:
             current_post = Post.objects.get(post_id=post_id) # The one in our database
             repeating_post_score = similar_posts_from_new_request[similar_posts_from_new_request['post_id']==post_id].score.iloc[0]
+            repeating_post_up = similar_posts_from_new_request[similar_posts_from_new_request['post_id']==post_id].ups.iloc[0]
             if current_post.score!= repeating_post_score:
                 # Vote count was changed, the post was same but the votes have changed.
                 # Score is the sum of (Upvotes - DownVotes)
@@ -88,15 +89,16 @@ class Reddit():
                     print(f'-> {current_post.post_id} - {current_post.title} had a vote count change of {repeating_post_score-current_post.score}\n') 
                 else:
                     print(f'-> {current_post.post_id} - {current_post.title} had a vote count change of {current_post.score - repeating_post_score}\n') 
-                #Update the new score in the DB
+                # Update the new score and upvotes in the DB, 
+                # new score means upvotes might have been changed
                 current_post.score = repeating_post_score
+                current_post.ups = repeating_post_up
                 current_post.save()
         print("-------------------------------------")
     def print_posts_not_in_top(self):
-        """ Since score might have been updated or new posts were
-        added we again fetch the latest id's order by score.This gives 
-        us or new top posts. We compare our new top posts with previous execution
-        top posts which we had saved when initializing the class
+        """ We compare our new top posts with previous execution
+        top posts which we had saved when initializing the class.Top
+        post is based only on upvotes.
         """
         top_n_posts = list(Post.objects.all().order_by('-ups').values_list('post_id',flat=True))
         n = self.top_posts_count # Number of post we consider to be top
