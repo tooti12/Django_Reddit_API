@@ -30,7 +30,7 @@ Quickstart
 
 ### Summary,Limitations,bugs,future work
   The api only fetches the top posts from the subreddit, reddit has different query params for (types,limit and time) of the
-  posts.Hot,New,Top etc are the post types.The code only fetches the top 75 posts (a limitation) over a month and calculates the new 
+  posts.Hot,New,Top etc are the post types.The code only fetches the top 75 posts (a limitation) for every call and calculates the new 
   top posts based on ups (as stated by reddit). The new top posts are not calculated for every subreddit separately but all post together
   in the database. This is also a limitation of the system
   If the project was broader, I would have gone with django rest framework and swagger for a better frontend of the api and given features of filtering, selecting what category of post you want,the time of post and maximum post. Calculating top post for every subreddit separately.
